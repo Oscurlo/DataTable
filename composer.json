@@ -1,0 +1,19 @@
+{
+    "name": "oscurlo/data-table",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Oscurlo\\DataTable\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Esteban Serna Palacios",
+            "email": "esteban.serna.p@gmail.com"
+        }
+    ],
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.67"
+    }
+}
