@@ -192,7 +192,6 @@ class DataTable extends Database
             $recordsFiltered = $this->fetchColumn("SELECT count(*) FROM {$this->table} WHERE {$this->filter} {$buildExtra([$this->condition])}", $this->preparedParams);
 
             $response = [
-                "query" => $query,
                 "draw" => $this->request["draw"],
                 "recordsTotal" => $recordsTotal,
                 "recordsFiltered" => $recordsFiltered,
