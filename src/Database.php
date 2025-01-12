@@ -12,6 +12,7 @@ class Database
 {
     protected static ?PDO $conn = null;
     protected string $gestor;
+    public array $support = ["mysql", "sqlsrv"];
     private array $options = [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY];
 
     public function __construct(array|PDO $sql_details)
@@ -20,6 +21,10 @@ class Database
             $this->gestor = self::$conn->getAttribute(PDO::ATTR_DRIVER_NAME);
         } else {
             $this->connect($sql_details);
+        }
+
+        if (!in_array($this->gestor, $this->support)) {
+            throw new InvalidArgumentException("Database manager not supported: {$this->gestor}");
         }
     }
 
@@ -39,7 +44,7 @@ class Database
 
         if (is_array($sql_details)) {
             if (!array_key_exists("dsn", $sql_details)) {
-                throw new InvalidArgumentException("...");
+                throw new InvalidArgumentException("The 'dsn' parameter is required.");
             }
 
             if (is_array($sql_details["dsn"])) {
@@ -78,23 +83,23 @@ class Database
         }
     }
 
-    protected function fetchAll(string $query, array|null $params = null, int $mode = PDO::FETCH_ASSOC)
+    protected function fetchAll(string $query, ?array $params = null, int $mode = PDO::FETCH_ASSOC)
     {
         return $this->fetch(__FUNCTION__, $query, $params, $mode);
     }
 
-    protected function fetchColumn(string $query, array|null $params = null, int $column = 0)
+    protected function fetchColumn(string $query, ?array $params = null, int $column = 0)
     {
         return $this->fetch(__FUNCTION__, $query, $params, $column);
     }
 
-    private function fetch(string $method, string $query, array|null $params = null, mixed $param)
+    private function fetch(string $method, string $query, ?array $params = null, mixed $param)
     {
         $stmt = self::$conn->prepare($query, $this->options);
         $exec = $stmt->execute($params);
 
         if (!$exec) {
-            throw new Exception("...");
+            throw new Exception("Error executing query: {$query}");
         }
 
         return $stmt->{$method}(

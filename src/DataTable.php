@@ -9,7 +9,6 @@ use Throwable;
 class DataTable extends Database
 {
     private array $request;
-    public array $support = ["mysql", "sqlsrv"];
     private string $primaryKey = "id";
     private string $table;
     private string $order;
@@ -168,10 +167,9 @@ class DataTable extends Database
                 $keyField = preg_replace("/\[(.*?)\]/", "$1", $db[2] ?? $db[1] ?? $db[0]);
                 $value = $alias ? $data[$alias] : $data[$keyField] ?? null;
 
-                $response[$i][] = is_callable($formatter)
-                    ? $formatter($value, $data, $key)
-                    : $value;
-                // : ($value ?? is_callable($fallback) && !empty($fallback) ? $fallback() : $fallback);
+                $response[$i][] = (string) empty($value) && !is_numeric($value) && $fallback !== null
+                    ? (is_callable($fallback) ? $fallback() : $fallback)
+                    : (is_callable($formatter) ? $formatter($value, $data, $key) : $value);
             }
         }
 
@@ -202,8 +200,6 @@ class DataTable extends Database
             ];
         } catch (Throwable $th) {
             $response["error"] = $th->getMessage();
-            $response["file"] = $th->getFile();
-            $response["line"] = $th->getLine();
         } finally {
             return $response;
         }
